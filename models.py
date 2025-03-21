@@ -5,29 +5,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///quiz.db'
 db=SQLAlchemy(app)
 
 
-
-
-class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(16), nullable=False)
-    email = db.Column(db.String(50), nullable=False)
-    password = db.Column(db.String(16), nullable=False)
-    scores = db.relationship('Scores', backref='usersuper', lazy=True)
-
-class Subject(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(16), nullable=False)
-    description = db.Column(db.String(500), nullable=False)
-    chapters = db.relationship('Chapter', backref='subjectsuper', lazy=True)
-
-class Chapter(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(16), nullable=False)
-    description = db.Column(db.String(500), nullable=False)
-    subject_id = db.Column(db.Integer, db.ForeignKey('subject.id'), nullable=False)
-    quizzes = db.relationship('Quiz', backref='chaptersuper', lazy=True)
-
-
 class Quiz(db.Model):
     id=db.Column(db.Integer, primary_key=True)
     chapter_id = db.Column(db.Integer, db.ForeignKey('chapter.id'), nullable=False)
@@ -53,3 +30,5 @@ class Scores(db.Model):
     total_scored = db.Column(db.Integer, nullable=False)
 
 
+with app.app_context():
+    db.create_all()

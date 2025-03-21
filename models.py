@@ -1,4 +1,9 @@
-from app import db
+from app import app
+from flask_sqlalchemy import SQLAlchemy
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///quiz.db'
+db=SQLAlchemy(app)
+
 
 
 
@@ -46,3 +51,5 @@ class Scores(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     time_stamp_of_attempt = db.Column(db.DateTime, nullable=False)
     total_scored = db.Column(db.Integer, nullable=False)
+
+

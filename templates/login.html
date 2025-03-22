@@ -2,5 +2,17 @@
 {%block title%}Login{%endblock%}
 
 {%block body%}
+<form method="POST" class="form-register" style="color:white">
     
+    {{form.hidden_tag()}}
+
+    {{form.email.label()}}
+    {{form.email(class="form-control",placeholder="Username")}}
+
+    {{form.password.label()}}
+    {{form.password(class="form-control",placeholder="Password")}}
+
+    <br>
+    <button class="btn btn-md btn-primary btn-block" type="submit">Register</button>
+</form>
 {%endblock%}

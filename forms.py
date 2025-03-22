@@ -1,15 +1,18 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, DateField
+from wtforms import StringField, PasswordField, DateField,SubmitField
+from wtforms.validators import Length, EqualTo, Email, DataRequired
 
-class loginForm():
-    username = StringField(label='Username:')
-    password = PasswordField(label='Password: ')
+class loginForm(FlaskForm):
+    email = StringField(label='Username:', validators=[Email(), DataRequired()])
+    password = PasswordField(label='Password: ', validators=[Length(min=8, max=70), DataRequired()])
+    submit=SubmitField(label='Submit')
 
-class registerForm():
-    firstname=StringField(label = 'First Name:')
-    lastname=StringField(label = 'Last Name:')
-    qualification=StringField(label='Qualifications:')
-    dob=DateField(label='Date of birth:')
-    username = StringField(label='Username(email):')
-    password = PasswordField(label='Password:')
-    checkpwd= PasswordField(label='Enter password again:')
+class registerForm(FlaskForm):
+    firstname=StringField(label = 'First Name:', validators=[Length(min=2, max=30), DataRequired()])
+    lastname=StringField(label = 'Last Name:' ,validators=[Length(min=2, max=30), DataRequired()])
+    qualification=StringField(label='Qualifications:', validators=[Length(min=2, max=300), DataRequired()])
+    dob=DateField(label='Date of birth:', validators=[DataRequired()])
+    email = StringField(label='Username(email):', validators=[Email(), DataRequired()])
+    password = PasswordField(label='Password:', validators=[Length(min=8, max=70), DataRequired()])
+    checkpwd= PasswordField(label='Enter password again:', validators=[EqualTo('password'), DataRequired()])
+    submit= SubmitField(label='Submit')

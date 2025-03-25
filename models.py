@@ -10,8 +10,8 @@ class User(db.Model, UserMixin):
     name = db.Column(db.String(30), nullable=False)
     email = db.Column(db.String(50), nullable=False)
     password = db.Column(db.String(70), nullable=False)
-    qualification = db.Column(db.String(300), nullable=False)
-    dob = db.Column(db.DateTime, nullable=False)
+    qualification = db.Column(db.String(300), nullable=True)
+    dob = db.Column(db.DateTime , nullable=True)
     scores = db.relationship('Scores', backref='usersuper', lazy=True)
 
 class Subject(db.Model):

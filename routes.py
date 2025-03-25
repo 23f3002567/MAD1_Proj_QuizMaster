@@ -16,7 +16,7 @@ def index():
 @app.route('/register', methods=['POST','GET'])
 def register():
     form=registerForm()
-    if form.validate_on_submit():
+    if form.validate_on_submit() and not User.query.filter_by(email=form.email.data).first():
         newUser= User(name=form.firstname.data+" "+form.lastname.data,email=form.email.data,password=form.password.data,qualification=form.qualification.data,dob=form.dob.data)
         db.session.add(newUser)
         db.session.commit()

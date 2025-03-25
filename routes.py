@@ -1,7 +1,7 @@
 from flask import render_template,redirect,url_for
 from config import app,db
 from models import User,Subject,Chapter,Quiz,Questions,Scores
-from forms import registerForm,loginForm,createSubForm
+from forms import registerForm,loginForm,createSubForm,createChpForm
 from flask_login import login_user, logout_user, login_required,current_user
 
 
@@ -65,3 +65,37 @@ def subdel(id):
         return redirect(url_for('index'))
     else:
         return redirect(url_for('index'))
+    
+@app.route('/subject/<sid>', methods=['POST','GET'])
+@login_required
+def chapters(sid): 
+    subject=Subject.query.filter_by(id=sid).first()
+    chapters=Chapter.query.filter_by(subject_id=sid).all()
+    return render_template("chapters.html",subject=subject,chapters=chapters)
+
+@app.route('/CreateChp/<sid>', methods=['POST','GET'])
+@login_required
+def chpcre(sid):
+    form=createChpForm()
+    if form.validate_on_submit():
+        newChp=Chapter(name=form.chpname.data,description=form.chpdesc.data,subject_id=sid)
+        db.session.add(newChp)
+        db.session.commit()
+        return redirect(url_for('chapters',sid=sid))
+    if current_user.email=="admin":
+        return render_template("chpcre.html",form=form)
+    else:
+        return redirect(url_for('index'))
+    
+@app.route('/deleteChp/<int:cid>', methods=['POST','GET'])
+@login_required
+def chpdel(cid):
+    if current_user.email=="admin":
+        delchp=Chapter.query.filter_by(id=cid).first()
+        sid=delchp.subject_id
+        db.session.delete(delchp)
+        db.session.commit()
+        return redirect(url_for('chapters', sid=sid))
+    else:
+        return redirect(url_for('index'))
+    

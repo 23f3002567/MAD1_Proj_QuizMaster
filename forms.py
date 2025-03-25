@@ -21,4 +21,8 @@ class createSubForm(FlaskForm):
     subname=StringField(label='Subject Name:', validators=[Length(min=2, max=16), DataRequired()])
     subdesc=StringField(label='Description:', validators=[Length(min=2, max=500), DataRequired()])
     submit=SubmitField(label='Submit')
-    
+
+class createChpForm(FlaskForm):
+    chpname=StringField(label='Chapter Name:', validators=[Length(min=2, max=16), DataRequired()])
+    chpdesc=StringField(label='Description:', validators=[Length(min=2, max=500), DataRequired()])
+    submit=SubmitField(label='Submit')

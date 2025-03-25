@@ -1,7 +1,7 @@
 from flask import render_template,redirect,url_for
 from config import app,db
 from models import User,Subject,Chapter,Quiz,Questions,Scores
-from forms import registerForm,loginForm
+from forms import registerForm,loginForm,createSubForm
 from flask_login import login_user, logout_user, login_required,current_user
 
 
@@ -40,3 +40,28 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for('login'))
+
+@app.route('/CreateSub', methods=['POST','GET'])
+@login_required
+def subcre():
+    form=createSubForm()
+    if form.validate_on_submit():
+        newSub=Subject(name=form.subname.data,description=form.subdesc.data)
+        db.session.add(newSub)
+        db.session.commit()
+        return redirect(url_for('index'))
+    if current_user.email=="admin":
+        return render_template("subcre.html",form=form)
+    else:
+        return redirect(url_for('index'))
+    
+@app.route('/deleteSub/<int:id>', methods=['POST','GET'])
+@login_required
+def subdel(id):
+    if current_user.email=="admin":
+        delsub=Subject.query.filter_by(id=id).first()
+        db.session.delete(delsub)
+        db.session.commit()
+        return redirect(url_for('index'))
+    else:
+        return redirect(url_for('index'))

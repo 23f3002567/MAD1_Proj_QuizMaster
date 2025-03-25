@@ -16,3 +16,9 @@ class registerForm(FlaskForm):
     password = PasswordField(label='Password:', validators=[Length(min=8, max=70), DataRequired()])
     checkpwd= PasswordField(label='Enter password again:', validators=[EqualTo('password'), DataRequired()])
     submit= SubmitField(label='Submit')
+
+class createSubForm(FlaskForm):
+    subname=StringField(label='Subject Name:', validators=[Length(min=2, max=16), DataRequired()])
+    subdesc=StringField(label='Description:', validators=[Length(min=2, max=500), DataRequired()])
+    submit=SubmitField(label='Submit')
+    

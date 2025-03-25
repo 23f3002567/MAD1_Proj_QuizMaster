@@ -1,38 +1,47 @@
 {% extends "base.html" %}
 
-{% block title %}IIT Madras Dashboard{% endblock %}
+{% block title %}Dashboard{% endblock %}
 
 {% block body %}
 <div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center">
-        <h2>My Current Courses</h2>
+    <div class="d-flex justify-content-between align-items-center ">
+        <h2>Current Courses</h2>
     </div>
-    {%for subject in subject%}
+    
         <div class="row mt-3">
+            {%for subject in subject%}
             <div class="col-md-3">
                 <a href="#" class="text-decoration-none">
-                    <div class="card bg-dark text-white rounded-lg card-hover">
+                    <div class="card bg-dark text-white rounded-lg card-hover mt-4">
                         <div class="card-body">
-                            <h5 class="card-title">Programming, Data Structures and Algorithms using Python</h5>
+                            <h5 class="card-title">{{subject.name}}</h5>
                             <hr style="border-top: 3px solid white;">
-                            <small>NEW COURSE</small>
+                            <small>{{subject.description}}</small>
                             <ul class="mt-2">
-                                <li>Week 1 Assignment - 78.00</li>
-                                <li>Week 2 Assignment - 96.00</li>
-                                <li>Week 3 Assignment - 96.00</li>
-                                <li>Week 4 Assignment - 90.00</li>
+                               <!-- <li>{{subject.description}}</li>  add chapter names-->
                             </ul>
                         </div>
                     </div>
                 </a>
+                <!-- add a cancel thing here-->
+                {%if current_user.email=='admin'%}
+                    <a href="{{url_for('subdel',id=subject.id)}}" class="btn btn-outline-danger btn-block mt-1">DELETE</a>
+                {%endif%}
             </div>
+            {%endfor%}
         </div>
-    {%endfor%}
-</div>
+        {%if current_user.email=='admin'%}
+            <a href="{{url_for('subcre')}}" class="btn btn-primary btn-lg rounded-circle ml-auto mt-2 justify-content-center align-items-center">+</a>        
+        {%endif%}
+    </div>
+
+
+
+
 
 <style>
 .card-hover {
-    border-radius: 15px !important;
+    border-radius: 10px !important;
 }
 
 .card-hover:hover {

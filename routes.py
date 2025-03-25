@@ -1,22 +1,25 @@
-from app import app
 from flask import render_template,redirect,url_for
-import models
+from config import app,db
+from models import User,Subject,Chapter,Quiz,Questions,Scores
 from forms import registerForm,loginForm
-from flask_login import login_user
+from flask_login import login_user, logout_user, login_required,current_user
+
 
 
 @app.route('/')
+@login_required
 def index():
-    return render_template("home.html")
+    subject = Subject.query.all()
+    return render_template("home.html",subject=subject)
 
 
 @app.route('/register', methods=['POST','GET'])
 def register():
     form=registerForm()
     if form.validate_on_submit():
-        newUser= models.User(name=form.firstname.data+" "+form.lastname.data,email=form.email.data,password=form.password.data,qualification=form.qualification.data,dob=form.dob.data)
-        models.db.session.add(newUser)
-        models.db.session.commit()
+        newUser= User(name=form.firstname.data+" "+form.lastname.data,email=form.email.data,password=form.password.data,qualification=form.qualification.data,dob=form.dob.data)
+        db.session.add(newUser)
+        db.session.commit()
         return redirect(url_for('login'))
     
     return render_template("register.html",form=form)
@@ -26,9 +29,14 @@ def register():
 def login():
     form=loginForm()
     if form.validate_on_submit():
-        user=models.User.query.filter_by(email=form.email.data).first()
+        user=User.query.filter_by(email=form.email.data).first()
         if user and user.password==form.password.data:
             login_user(user)
             return redirect(url_for('index'))
         
     return render_template("login.html", form=form)
+
+@app.route('/logout', methods=['POST','GET'])
+def logout():
+    logout_user()
+    return redirect(url_for('login'))

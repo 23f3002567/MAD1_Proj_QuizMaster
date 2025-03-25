@@ -1,9 +1,11 @@
-from flask import Flask,render_template
-app = Flask(__name__)
-app.config['SECRET_KEY']= 'e60b224224c50fb846f1b04b'
+from config import app,db,login_manager
 
-import models,routes
-    
+
+import models
+with app.app_context():
+    db.create_all()
+
+import routes
 
 if __name__ == '__main__':
     app.run(debug=True)

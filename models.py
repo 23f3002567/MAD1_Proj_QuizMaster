@@ -1,11 +1,5 @@
-from app import app
-from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager,login_user,UserMixin
-
-login_manager=LoginManager(app)
-
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///quiz.db'
-db=SQLAlchemy(app)
+from config import app,db,login_manager
+from flask_login import login_user,UserMixin
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -59,5 +53,3 @@ class Scores(db.Model):
     total_scored = db.Column(db.Integer, nullable=False)
 
 
-with app.app_context():
-    db.create_all()

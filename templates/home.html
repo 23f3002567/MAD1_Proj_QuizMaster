@@ -1,6 +1,43 @@
-{%extends "base.html"%}
-{%block title%}Home{%endblock%}
+{% extends "base.html" %}
 
-{%block body%}
-<h1>Welcome to Quizzler</h1>
-{%endblock%}
+{% block title %}IIT Madras Dashboard{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center">
+        <h2>My Current Courses</h2>
+    </div>
+    {%for subject in subject%}
+        <div class="row mt-3">
+            <div class="col-md-3">
+                <a href="#" class="text-decoration-none">
+                    <div class="card bg-dark text-white rounded-lg card-hover">
+                        <div class="card-body">
+                            <h5 class="card-title">Programming, Data Structures and Algorithms using Python</h5>
+                            <hr style="border-top: 3px solid white;">
+                            <small>NEW COURSE</small>
+                            <ul class="mt-2">
+                                <li>Week 1 Assignment - 78.00</li>
+                                <li>Week 2 Assignment - 96.00</li>
+                                <li>Week 3 Assignment - 96.00</li>
+                                <li>Week 4 Assignment - 90.00</li>
+                            </ul>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    {%endfor%}
+</div>
+
+<style>
+.card-hover {
+    border-radius: 15px !important;
+}
+
+.card-hover:hover {
+    background-color: #495057 !important;
+}
+</style>
+
+{% endblock %}

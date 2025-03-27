@@ -1,9 +1,9 @@
-from flask import render_template,redirect,url_for
+from flask import render_template,redirect,url_for,request
 from config import app,db
 from models import User,Subject,Chapter,Quiz,Questions,Scores
 from forms import registerForm,loginForm,createSubForm,createChpForm,createQuizForm,createQuesForm
 from flask_login import login_user, logout_user, login_required,current_user
-
+from datetime import datetime
 
 
 @app.route('/')
@@ -83,9 +83,9 @@ def chpcre(sid):
         db.session.commit()
         return redirect(url_for('chapters',sid=sid))
     if current_user.email=="admin":
-        return render_template("chpcre.html",form=form)
+        return render_template("chpcre.html",form=form,sid=sid)
     else:
-        return redirect(url_for('index'))
+        return redirect(url_for('chapters',sid=sid))
     
 @app.route('/deleteChp/<int:cid>', methods=['POST','GET'])
 @login_required
@@ -110,22 +110,81 @@ def quizzes(cid):
 @login_required
 def quizcre(cid):
     form=createQuizForm()
-    if form.validate_on_submit():
-        newQuiz=Quiz(name=form.quizname.data,date_of_quiz=form.date.data,time_duration=form.time.data,remarks=form.remarks.data,chapter_id=cid)
-        db.session.add(newQuiz)
-        db.session.commit()
-        return redirect(url_for('questioncre',qid=newQuiz.id))
-    return render_template("quizcre.html",form=form)
+    if current_user.email=="admin":
+        if form.validate_on_submit():
+            newQuiz=Quiz(name=form.quizname.data,date_of_quiz=form.date.data,time_duration=form.time.data,remarks=form.remarks.data,chapter_id=cid)
+            db.session.add(newQuiz)
+            db.session.commit()
+            return redirect(url_for('questioncre',qid=newQuiz.id))
+        return render_template("quizcre.html",form=form,cid=cid)
+    return redirect(url_for('quizzes', cid=cid))
 
 @app.route('/AddQuestion/<qid>', methods=['POST','GET'])
 @login_required
 def questioncre(qid):
-    form=createQuesForm()
-    questions=Questions.query.filter_by(quiz_id=qid).all()
-    if form.validate_on_submit():
-        form.correct_option.data=int(form.correct_option.data)
-        newQues=Questions(quiz_id=qid,question_statement=form.question_statement.data,correct_option=form.correct_option.data,option1=form.option1.data,option2=form.option2.data,option3=form.option3.data,option4=form.option4.data)
-        db.session.add(newQues)
+    cid=Quiz.query.filter_by(id=qid).first().chapter_id
+    if current_user.email=="admin":
+        form=createQuesForm()
+        questions=Questions.query.filter_by(quiz_id=qid).all()
+        if form.validate_on_submit():
+            form.correct_option.data=int(form.correct_option.data)
+            newQues=Questions(quiz_id=qid,question_statement=form.question_statement.data,correct_option=form.correct_option.data,option1=form.option1.data,option2=form.option2.data,option3=form.option3.data,option4=form.option4.data)
+            db.session.add(newQues)
+            db.session.commit()
+            return redirect(url_for('questioncre',qid=qid))    
+        return render_template("questioncre.html",form=form,questions=questions,cid=cid)
+    return redirect(url_for('quizzes', cid=cid))
+
+@app.route('/delete/<int:qid>', methods=['POST','GET'])
+@login_required
+def quizdel(qid):
+    if current_user.email=="admin":
+        delquiz=Quiz.query.filter_by(id=qid).first()
+        cid=delquiz.chapter_id
+        db.session.delete(delquiz)
         db.session.commit()
-        return redirect(url_for('questioncre',qid=qid))
-    return render_template("questioncre.html",form=form,questions=questions)
+        return redirect(url_for('quizzes', cid=cid))
+    else:
+        return redirect(url_for('quizzes', cid=cid))
+
+@app.route('/delete/<int:quesid>', methods=['POST','GET'])
+@login_required
+def quesdel(quesid):
+    if current_user.email=="admin":
+        delques=Questions.query.filter_by(id=quesid).first()
+        qid=delques.quiz_id
+        db.session.delete(delques)
+        db.session.commit()
+        return redirect(url_for('questioncre', qid=qid))
+    else:
+        return redirect(url_for('questioncre', qid=qid))
+    
+@app.route('/QuizCheck/<int:qid>', methods=['POST','GET'])
+@login_required
+def quizcheck(qid):
+    quiz = Quiz.query.filter_by(id=qid).first()
+    questions = Questions.query.filter_by(quiz_id=qid).all()
+    score=0
+    if request.method=='POST':
+        for question in questions:
+            answer = request.form.get(str(question.id))
+            if int(answer) == question.correct_option :
+                score=score+1
+        if not Scores.query.filter_by(quiz_id=qid, user_id=current_user.id).first():
+            newScore = Scores(quiz_id=qid, user_id=current_user.id, time_stamp_of_attempt=datetime.now(), total_scored=score)
+            db.session.add(newScore)
+            db.session.commit()
+        else:
+            oldScore = Scores.query.filter_by(quiz_id=qid, user_id=current_user.id).first()
+            oldScore.total_scored = score
+            db.session.commit()
+        return redirect(url_for('quizzes', cid=quiz.chapter_id))
+    return redirect(url_for('index'))
+    
+@app.route('/quiz/<int:qid>', methods=['POST','GET'])
+@login_required
+def quiz(qid):
+    if current_user.email != "admin":
+        questions = Questions.query.filter_by(quiz_id=qid).all()
+        return render_template("theQuiz.html",questions=questions)
+    return redirect(url_for('quizzes', cid=Quiz.query.filter_by(id=qid).first().chapter_id))

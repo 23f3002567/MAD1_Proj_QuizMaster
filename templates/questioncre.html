@@ -7,6 +7,7 @@
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center ">
         <h2>Questions:</h2>
+        <a href="{{url_for('quizzes',cid=cid)}}" class="btn btn-outline-light btn-sm">DONE</a>
     </div>
     {%for question in questions%}
         <div>
@@ -26,7 +27,7 @@
                 </ul>
             </div>
             {%if current_user.email=='admin'%}
-                <a href="#" class="btn btn-outline-danger btn-block mt-1">DELETE</a>
+                <a href="{{url_for('quesdel',quesid=question.id)}}" class="btn btn-outline-danger btn-block mt-1">DELETE</a>
             {%endif%}
             <br>
         </div>

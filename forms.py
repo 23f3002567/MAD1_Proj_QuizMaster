@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, DateField,SubmitField
+from wtforms import StringField, PasswordField, DateField,SubmitField, RadioField
 from wtforms.validators import Length, EqualTo, Email, DataRequired
 
 class loginForm(FlaskForm):
@@ -25,4 +25,20 @@ class createSubForm(FlaskForm):
 class createChpForm(FlaskForm):
     chpname=StringField(label='Chapter Name:', validators=[Length(min=2, max=16), DataRequired()])
     chpdesc=StringField(label='Description:', validators=[Length(min=2, max=500), DataRequired()])
+    submit=SubmitField(label='Submit')
+
+class createQuizForm(FlaskForm):
+    quizname=StringField(label='Quiz Name:', validators=[Length(min=2, max=16), DataRequired()])
+    date=DateField(label='Date of Quiz:', validators=[DataRequired()])
+    time=StringField(label='Time Duration:', validators=[DataRequired()])
+    remarks=StringField(label='Remarks:', validators=[Length(min=2, max=500), DataRequired()])
+    submit=SubmitField(label='Submit')
+
+class createQuesForm(FlaskForm):
+    question_statement=StringField(label='Question:', validators=[Length(min=2, max=500), DataRequired()])
+    correct_option=RadioField('Correct Option', choices=[(1, 'Option 1'), (2, 'Option 2'), (3, 'Option 3'), (4, 'Option 4')], validators=[DataRequired()])
+    option1=StringField(label='Option 1:', validators=[Length(min=2, max=10), DataRequired()])
+    option2=StringField(label='Option 2:', validators=[Length(min=2, max=10), DataRequired()])
+    option3=StringField(label='Option 3:', validators=[Length(min=2, max=10), DataRequired()])
+    option4=StringField(label='Option 4:', validators=[Length(min=2, max=10), DataRequired()])
     submit=SubmitField(label='Submit')

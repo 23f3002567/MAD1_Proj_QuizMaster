@@ -1,7 +1,7 @@
 from flask import render_template,redirect,url_for
 from config import app,db
 from models import User,Subject,Chapter,Quiz,Questions,Scores
-from forms import registerForm,loginForm,createSubForm,createChpForm
+from forms import registerForm,loginForm,createSubForm,createChpForm,createQuizForm,createQuesForm
 from flask_login import login_user, logout_user, login_required,current_user
 
 
@@ -99,3 +99,33 @@ def chpdel(cid):
     else:
         return redirect(url_for('index'))
     
+@app.route('/chapter/<cid>', methods=['POST','GET'])
+@login_required
+def quizzes(cid):
+    chapter=Chapter.query.filter_by(id=cid).first() 
+    quizzes=Quiz.query.filter_by(chapter_id=cid).all()
+    return render_template("quizzes.html",chapter=chapter,quizzes=quizzes)
+
+@app.route('/CreateQuiz/<cid>', methods=['POST','GET'])
+@login_required
+def quizcre(cid):
+    form=createQuizForm()
+    if form.validate_on_submit():
+        newQuiz=Quiz(name=form.quizname.data,date_of_quiz=form.date.data,time_duration=form.time.data,remarks=form.remarks.data,chapter_id=cid)
+        db.session.add(newQuiz)
+        db.session.commit()
+        return redirect(url_for('questioncre',qid=newQuiz.id))
+    return render_template("quizcre.html",form=form)
+
+@app.route('/AddQuestion/<qid>', methods=['POST','GET'])
+@login_required
+def questioncre(qid):
+    form=createQuesForm()
+    questions=Questions.query.filter_by(quiz_id=qid).all()
+    if form.validate_on_submit():
+        form.correct_option.data=int(form.correct_option.data)
+        newQues=Questions(quiz_id=qid,question_statement=form.question_statement.data,correct_option=form.correct_option.data,option1=form.option1.data,option2=form.option2.data,option3=form.option3.data,option4=form.option4.data)
+        db.session.add(newQues)
+        db.session.commit()
+        return redirect(url_for('questioncre',qid=qid))
+    return render_template("questioncre.html",form=form,questions=questions)

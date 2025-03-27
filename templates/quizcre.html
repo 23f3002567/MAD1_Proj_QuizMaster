@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}Create Quiz{% endblock %}
+
+{% block body %}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center ">
+        <h2>Create Quiz</h2>
+    </div>
+
+    <form method="POST" class="form-register" style="color:white">
+        {{form.hidden_tag()}}
+        {{form.quizname.label()}}
+        {{form.quizname(class="form-control",placeholder="Quiz Name")}}
+        <br>
+        {{form.date.label()}}
+        {{form.date(class="form-control",placeholder="Date of Quiz")}}
+        <br>
+        {{form.time.label()}}
+        {{form.time(class="form-control",placeholder="Time Duration")}}
+        <br>
+        {{form.remarks.label()}}
+        {{form.remarks(class="form-control",placeholder="Remarks")}}
+        <br>
+        {{form.submit(class="btn btn-md btn-primary btn-block", value="Create")}}
+    </form>
+</div>    
+{%endblock%}

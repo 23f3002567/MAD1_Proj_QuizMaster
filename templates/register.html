@@ -2,7 +2,8 @@
 {%block title%}Register{%endblock%}
 
 {%block body%}
-    <form method="POST" class="form-register" style="color:white">
+<div class="container d-flex justify-content-center align-items-center mt-5">
+    <form method="POST" class="form-register w-50 p-4 rounded shadow bg-dark text-white" style="color:white">
         {{form.hidden_tag()}}
         {{form.firstname.label()}}
         {{form.firstname(class="form-control",placeholder="Firstname")}}

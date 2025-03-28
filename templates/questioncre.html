@@ -27,12 +27,14 @@
                 </ul>
             </div>
             {%if current_user.email=='admin'%}
-                <a href="{{url_for('quesdel',quesid=question.id)}}" class="btn btn-outline-danger btn-block mt-1">DELETE</a>
+                    <a href="{{url_for('quesdel',quesid=question.id)}}" class="btn btn-outline-danger btn-block mt-1">DELETE</a>
+                    <a href="{{url_for('quizzes',cid=cid)}}" class="btn btn-outline-info btn-block mt-1">DONE</a>
             {%endif%}
             <br>
         </div>
     {%endfor%}
-    <form method="POST" class="form-register" style="color:white">
+    <div class="container d-flex justify-content-center align-items-center mt-5">
+        <form method="POST" class="form-register w-50 p-4 rounded shadow bg-dark text-white" style="color:white">
         {{form.hidden_tag()}}
         {{form.question_statement.label()}}
         {{form.question_statement(class="form-control",placeholder="Question")}}

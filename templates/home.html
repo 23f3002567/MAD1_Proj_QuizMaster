@@ -15,11 +15,15 @@
                 <a href="{{url_for('chapters',sid = subject.id)}}" class="text-decoration-none">
                     <div class="card bg-dark text-white rounded-lg card-hover mt-4">
                         <div class="card-body">
-                            <h5 class="card-title">{{subject.name}}</h5>
+                            <h4 class="card-title">{{subject.name}}</h4>
                             <hr style="border-top: 3px solid white;">
                             <small>{{subject.description}}</small>
                             <ul class="mt-2">
-                               <!-- <li>{{subject.description}}</li>  add chapter names-->
+                                {%for chapter in chapters%}
+                                    {%if chapter.subject_id==subject.id%}
+                                        <li>{{chapter.name}}</li>
+                                    {%endif%}
+                                {%endfor%}
                             </ul>
                         </div>
                     </div>

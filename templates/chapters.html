@@ -19,7 +19,11 @@
                         <hr style="border-top: 3px solid white;">
                         <small>{{chapter.description}}</small>
                         <ul class="mt-2">
-                            <!-- <li>{{subject.description}}</li>  add chapter names-->
+                            {%for quiz in quizzes%}
+                                {%if quiz.chapter_id==chapter.id%}
+                                    <li>{{quiz.name}}</li>
+                                {%endif%}
+                            {%endfor%}
                         </ul>
                     </div>
                 </div>

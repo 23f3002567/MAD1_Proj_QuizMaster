@@ -10,7 +10,8 @@
         <a href="{{url_for('index')}}" class="btn btn-outline-light btn-sm">BACK</a>
     </div>
 
-    <form method="POST" class="form-register" style="color:white">
+    <div class="container d-flex justify-content-center align-items-center mt-5">
+        <form method="POST" class="form-register w-75 p-4 rounded shadow bg-dark text-white" style="color:white">
         {{form.hidden_tag()}}
         {{form.subname.label()}}
         {{form.subname(class="form-control",placeholder="Subject Name")}}

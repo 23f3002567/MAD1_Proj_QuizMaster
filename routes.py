@@ -222,13 +222,17 @@ def quiz(qid):
 
 @app.route('/scores', methods=['POST','GET'])
 @login_required
-def scores():
+def scores(uid=None):
     
     subjects=Subject.query.all()
     chapters=Chapter.query.all()
     quizzes = Quiz.query.all()
-    scores = Scores.query.filter_by(user_id=current_user.id).all()
-    return render_template("scores.html",subjects=subjects, chapters=chapters, quizzes=quizzes,scores=scores)
+    if current_user.email != "admin":
+        scores = Scores.query.filter_by(user_id=uid).order_by(Scores.time_stamp_of_attempt).all()
+        return render_template("scores.html",subjects=subjects, chapters=chapters, quizzes=quizzes,scores=scores)
+    else:
+        scores = Scores.query.order_by(Scores.time_stamp_of_attempt).all()
+        return render_template("scores.html",subjects=subjects, chapters=chapters, quizzes=quizzes,scores=scores)
     
 @app.route('/search', methods=['POST','GET'])
 @login_required
@@ -240,5 +244,14 @@ def search():
         quizzes = Quiz.query.filter(Quiz.name.like('%' + search_query + '%')).all()
         users= User.query.filter(User.name.like('%' + search_query + '%')).all()
         return render_template("search.html", subjects=subjects, chapters=chapters, quizzes=quizzes, users=users)
+    else:
+        return redirect(url_for('index'))
+    
+@app.route('/admScores', methods=['POST','GET'])
+@login_required
+def admScores():
+    if current_user.email=="admin":
+        users = User.query.all()
+        return render_template("admScores.html", users=users)
     else:
         return redirect(url_for('index'))

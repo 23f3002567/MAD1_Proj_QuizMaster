@@ -45,7 +45,7 @@
                                                         <td><a href="#" class="text-primary font-weight-bold">{{ quiz.name }}</a></td>
                                                         <td>{{ score.total_scored }}</td>
                                                         <td>{{ "%.1f"|format(score.percentage) }}%</td>
-                                                        <td>{{ score.time_stamp_of_attempt.strftime('%Y-%m-%d %H:%M') }}</td>
+                                                        <td>{{ score.time_stamp_of_attempt.strftime('%d-%m-%y %H:%M') }}</td>
                                                     </tr>
                                                 {% endif %}
                                             {% endfor %}

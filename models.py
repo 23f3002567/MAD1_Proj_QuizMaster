@@ -33,7 +33,7 @@ class Quiz(db.Model):
     name=db.Column(db.String(50), nullable=False)
     chapter_id = db.Column(db.Integer, db.ForeignKey('chapter.id'), nullable=False)
     date_of_quiz = db.Column(db.DateTime, nullable=False)
-    time_duration = db.Column(db.Integer, nullable=False)
+    time_duration = db.Column(db.Time, nullable=False)
     remarks = db.Column(db.String(500), nullable=False)
     questions = db.relationship('Questions', backref='quizsuper',cascade='all, delete', lazy=True)
     scores = db.relationship('Scores', backref='quizsuper', lazy=True, cascade='all, delete-orphan')

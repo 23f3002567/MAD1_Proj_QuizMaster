@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, DateField,SubmitField, RadioField,TextAreaField
-from wtforms.validators import Length, EqualTo, Email, DataRequired, ValidationError
+from wtforms import StringField, PasswordField, DateField, SubmitField, RadioField, TextAreaField, TimeField
+from wtforms.validators import Length, EqualTo, Email, DataRequired, ValidationError,Regexp
+from datetime import time
 import models
 
 
@@ -48,11 +49,12 @@ class createQuizForm(FlaskForm):
         name=models.Quiz.query.filter_by(name=quiz_to_check.data).first()
         if name:
             raise ValidationError('Quiz already exists. Please create a new one.')
-    quizname=StringField(label='Quiz Name:', validators=[Length(min=2, max=16), DataRequired()])
-    date=DateField(label='Date of Quiz:', validators=[DataRequired()])
-    time=StringField(label='Time Duration:', validators=[DataRequired()])
-    remarks=TextAreaField(label='Remarks:', validators=[Length(min=2, max=500), DataRequired()])
-    submit=SubmitField(label='Submit')
+    
+    quizname = StringField(label='Quiz Name:', validators=[Length(min=2, max=16), DataRequired()])
+    date = DateField(label='Date of Quiz:', validators=[DataRequired()])
+    time_duration = StringField(label='Time Duration (HH:MM):', validators=[DataRequired(),Regexp('^([0-9]{2}):([0-9]{2})$', message='Invalid time format. Use HH:MM.')])
+    remarks = TextAreaField(label='Remarks:', validators=[Length(min=2, max=500), DataRequired()])
+    submit = SubmitField(label='Submit')
 
 class createQuesForm(FlaskForm):
     def validate_question_statement(self,question_to_check):

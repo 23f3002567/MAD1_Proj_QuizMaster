@@ -3,7 +3,7 @@ from config import app,db
 from forms import registerForm,loginForm,createSubForm,createChpForm,createQuizForm,createQuesForm
 from models import User,Subject,Chapter,Quiz,Questions,Scores
 from flask_login import login_user, logout_user, login_required,current_user
-from datetime import datetime
+from datetime import datetime,time
 
 
 @app.route('/')
@@ -129,7 +129,9 @@ def quizcre(cid):
     form=createQuizForm()
     if current_user.email=="admin":
         if form.validate_on_submit():
-            newQuiz=Quiz(name=form.quizname.data,date_of_quiz=form.date.data,time_duration=form.time.data,remarks=form.remarks.data,chapter_id=cid)
+            hours,minutes=form.time_duration.data.split(':')
+            timed=time(hour=int(hours),minute=int(minutes))
+            newQuiz=Quiz(name=form.quizname.data,date_of_quiz=form.date.data,time_duration=timed,remarks=form.remarks.data,chapter_id=cid)
             db.session.add(newQuiz)
             db.session.commit()
             return redirect(url_for('questioncre',qid=newQuiz.id))
@@ -253,5 +255,23 @@ def admScores():
     if current_user.email=="admin":
         users = User.query.all()
         return render_template("admScores.html", users=users)
+    else:
+        return redirect(url_for('index'))
+    
+@app.route('/editch/<int:cid>', methods=['POST','GET'])
+@login_required
+def edit(cid):
+    if current_user.email=="admin":
+        chapter = Chapter.query.filter_by(id=cid).first()
+        form = createChpForm(obj=chapter)
+        if form.validate_on_submit():
+            chapter.name = form.chpname.data
+            chapter.description = form.chpdesc.data
+            db.session.commit()
+            return redirect(url_for('chapters', sid=chapter.subject_id))
+        if form.errors != {}:
+            for err_msg in form.errors.values():
+                flash(f'{err_msg[0]}', category='danger')
+        return render_template("edit.html",form=form)
     else:
         return redirect(url_for('index'))

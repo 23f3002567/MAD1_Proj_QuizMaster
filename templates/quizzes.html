@@ -21,8 +21,8 @@
                         <div class="card-body">
                             <h5 class="card-title">{{quiz.name}}</h5>
                             <hr style="border-top: 3px solid white;">
-                            <ul class="mt-2">
-                                <li>Date added : {{quiz.date_of_quiz}}</li>
+                            <ul class="mt-2 list-unstyled">
+                                <li>Date added : {{quiz.date_of_quiz.strftime('%d-%m-%y')}}</li>
                                 <li>Quiz Time: {{quiz.time_duration}}</li>
                                 <li>Remarks: {{quiz.remarks}}</li>
                                 <li>Marks: {{quiz.percent}}</li>

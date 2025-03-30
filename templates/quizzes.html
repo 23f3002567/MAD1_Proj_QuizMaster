@@ -25,7 +25,11 @@
                                 <li>Date added : {{quiz.date_of_quiz.strftime('%d-%m-%y')}}</li>
                                 <li>Quiz Time: {{quiz.time_duration}}</li>
                                 <li>Remarks: {{quiz.remarks}}</li>
-                                <li>Marks: {{quiz.percent}}</li>
+                                {%for score in scores%}
+                                    {%if score.quiz_id==quiz.id and score.user_id==current_user.id%}
+                                        <li>Marks: {{score.percentage}}</li>
+                                    {%endif%}
+                                {%endfor%}
                             </ul>
                         </div>
                     </div>

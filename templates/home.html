@@ -6,7 +6,7 @@
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center inline ">
         <h2>Current Courses</h2>
-        <a href="{{url_for('index')}}" class="btn btn-outline-light btn-sm">BACK</a>
+        <a href="{{url_for('start')}}" class="btn btn-outline-light btn-sm">BACK</a>
     </div>
     
         <div class="row mt-3">
@@ -30,6 +30,7 @@
                 </a>
                 <!-- add a cancel thing here-->
                 {%if current_user.email=='admin'%}
+                    <a href="{{url_for('edits',sid=subject.id)}}" class="btn btn-outline-info btn-block mt-1">EDIT</a>
                     <a href="{{url_for('subdel',id=subject.id)}}" class="btn btn-outline-danger btn-block mt-1">DELETE</a>
                 {%endif%}
             </div>

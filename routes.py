@@ -5,8 +5,10 @@ from models import User,Subject,Chapter,Quiz,Questions,Scores
 from flask_login import login_user, logout_user, login_required,current_user
 from datetime import datetime,time
 
-
 @app.route('/')
+def start():
+    return render_template("startPage.html")
+@app.route('/sub')
 @login_required
 def index():
     subject = Subject.query.all()
@@ -82,10 +84,8 @@ def subdel(id):
 def chapters(sid): 
     subject=Subject.query.filter_by(id=sid).first()
     chapters=Chapter.query.filter_by(subject_id=sid).all()
-    if chapters != []:
-        quizzes=Quiz.query.filter_by(chapter_id=chapters[0].id).all()
-        return render_template("chapters.html",subject=subject,chapters=chapters,quizzes=quizzes)
-    return render_template("chapters.html",subject=subject,chapters=chapters)
+    quizzes = Quiz.query.filter(Quiz.chapter_id.in_([chapter.id for chapter in chapters])).all()
+    return render_template("chapters.html",subject=subject,chapters=chapters,quizzes=quizzes)
 
 @app.route('/CreateChp/<sid>', methods=['POST','GET'])
 @login_required
@@ -121,7 +121,11 @@ def chpdel(cid):
 def quizzes(cid):
     chapter=Chapter.query.filter_by(id=cid).first() 
     quizzes=Quiz.query.filter_by(chapter_id=cid).all()
-    return render_template("quizzes.html",chapter=chapter,quizzes=quizzes)
+    if quizzes != []:
+        scores=Scores.query.filter_by(user_id=current_user.id).all()
+        return render_template("quizzes.html",chapter=chapter,quizzes=quizzes,scores=scores)
+    else:
+        return render_template("quizzes.html",chapter=chapter,quizzes=quizzes)
 
 @app.route('/CreateQuiz/<cid>', methods=['POST','GET'])
 @login_required
@@ -147,6 +151,7 @@ def questioncre(qid):
     cid=Quiz.query.filter_by(id=qid).first().chapter_id
     if current_user.email=="admin":
         form=createQuesForm()
+        form.qid=qid
         questions=Questions.query.filter_by(quiz_id=qid).all()
         if form.validate_on_submit():
             form.correct_option.data=int(form.correct_option.data)
@@ -210,8 +215,9 @@ def quizcheck(qid):
         else:
             oldScore = Scores.query.filter_by(quiz_id=qid, user_id=current_user.id).first()
             oldScore.total_scored = score
+            oldScore.percentage = percent
             db.session.commit()
-        return redirect(url_for('quizzes', cid=quiz.chapter_id))
+        return redirect(url_for('scores'))
     return redirect(url_for('index'))
     
 @app.route('/quiz/<int:qid>', methods=['POST','GET'])
@@ -222,19 +228,39 @@ def quiz(qid):
         return render_template("theQuiz.html",questions=questions)
     return redirect(url_for('quizzes', cid=Quiz.query.filter_by(id=qid).first().chapter_id))
 
+@app.route('/score/<int:uid>', methods=['POST','GET'])
 @app.route('/scores', methods=['POST','GET'])
 @login_required
 def scores(uid=None):
     
     subjects=Subject.query.all()
     chapters=Chapter.query.all()
-    quizzes = Quiz.query.all()
+    chartData = {}
     if current_user.email != "admin":
-        scores = Scores.query.filter_by(user_id=uid).order_by(Scores.time_stamp_of_attempt).all()
-        return render_template("scores.html",subjects=subjects, chapters=chapters, quizzes=quizzes,scores=scores)
+        quizzes = []
+        scores = Scores.query.filter_by(user_id=current_user.id).order_by(Scores.time_stamp_of_attempt).all()
+        for score in scores:
+            quiz = Quiz.query.filter_by(id=score.quiz_id).first()
+            quizzes.append(Quiz.query.filter_by(id=score.quiz_id).first())
+
+            if quiz.chapter_id not in chartData:
+                chartData[quiz.chapter_id] = {
+                    'labels':[],
+                    'scores':[]
+                }
+
+            chartData[quiz.chapter_id]['labels'].append(quiz.name)
+            chartData[quiz.chapter_id]['scores'].append(score.percentage)
+
+
+
+        return render_template("scores1.html",subjects=subjects, chapters=chapters, quizzes=quizzes,scores=scores, uid=current_user.id, chartData=chartData)
     else:
-        scores = Scores.query.order_by(Scores.time_stamp_of_attempt).all()
-        return render_template("scores.html",subjects=subjects, chapters=chapters, quizzes=quizzes,scores=scores)
+        quizzes = []
+        scores = Scores.query.filter_by(user_id=uid).order_by(Scores.time_stamp_of_attempt).all()
+        for score in scores:
+            quizzes.append(Quiz.query.filter_by(id=score.quiz_id).first())
+        return render_template("scores1.html",subjects=subjects, chapters=chapters, quizzes=quizzes,scores=scores, uid=uid, chartData=chartData)
     
 @app.route('/search', methods=['POST','GET'])
 @login_required
@@ -260,10 +286,11 @@ def admScores():
     
 @app.route('/editch/<int:cid>', methods=['POST','GET'])
 @login_required
-def edit(cid):
+def editc(cid):
     if current_user.email=="admin":
         chapter = Chapter.query.filter_by(id=cid).first()
-        form = createChpForm(obj=chapter)
+        form = createChpForm()
+        form.chapter_id = chapter.id
         if form.validate_on_submit():
             chapter.name = form.chpname.data
             chapter.description = form.chpdesc.data
@@ -272,6 +299,29 @@ def edit(cid):
         if form.errors != {}:
             for err_msg in form.errors.values():
                 flash(f'{err_msg[0]}', category='danger')
-        return render_template("edit.html",form=form)
+        form.chpname.data = chapter.name
+        form.chpdesc.data = chapter.description
+        return render_template("editch.html", form=form, chapter=chapter, sid=chapter.subject_id)
+    else:
+        return redirect(url_for('index'))
+    
+@app.route('/edits/<int:sid>', methods=['POST','GET'])
+@login_required
+def edits(sid):
+    if current_user.email=="admin":
+        subject = Subject.query.filter_by(id=sid).first()
+        form = createSubForm()
+        form.subject_id = subject.id
+        if form.validate_on_submit():
+            subject.name = form.subname.data
+            subject.description = form.subdesc.data
+            db.session.commit()
+            return redirect(url_for('index'))
+        if form.errors != {}:
+            for err_msg in form.errors.values():
+                flash(f'{err_msg[0]}', category='danger')
+        form.subname.data = subject.name
+        form.subdesc.data = subject.description
+        return render_template("edits.html", form=form, subject=subject)
     else:
         return redirect(url_for('index'))

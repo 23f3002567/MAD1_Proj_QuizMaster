@@ -11,28 +11,29 @@
     
     <div class="row mt-3">
         {%for chapter in chapters%}
-        <div class="col-md-3">
-            <a href="{{url_for('quizzes', cid=chapter.id)}}" class="text-decoration-none">
-                <div class="card bg-dark text-white rounded-lg card-hover mt-4">
-                    <div class="card-body">
-                        <h5 class="card-title">{{chapter.name}}</h5>
-                        <hr style="border-top: 3px solid white;">
-                        <small>{{chapter.description}}</small>
-                        <ul class="mt-2">
-                            {%for quiz in quizzes%}
-                                {%if quiz.chapter_id==chapter.id%}
-                                    <li>{{quiz.name}}</li>
-                                {%endif%}
-                            {%endfor%}
-                        </ul>
+            <div class="col-md-3">
+                <a href="{{url_for('quizzes', cid=chapter.id)}}" class="text-decoration-none">
+                    <div class="card bg-dark text-white rounded-lg card-hover mt-4">
+                        <div class="card-body">
+                            <h5 class="card-title">{{chapter.name}}</h5>
+                            <hr style="border-top: 3px solid white;">
+                            <small>{{chapter.description}}</small>
+                            <ul class="mt-2">
+                                {%for quiz in quizzes%}
+                                    {%if quiz.chapter_id==chapter.id%}
+                                        <li>{{quiz.name}}</li>
+                                    {%endif%}
+                                {%endfor%}
+                            </ul>
+                        </div>
                     </div>
-                </div>
-            </a>
-            <!-- add a cancel thing here-->
-            {%if current_user.email=='admin'%}
-                <a href="{{url_for('chpdel',cid=chapter.id)}}" class="btn btn-outline-danger btn-block mt-1">DELETE</a>
-            {%endif%}
-        </div>
+                </a>
+                <!-- add a cancel thing here-->
+                {%if current_user.email=='admin'%}
+                    <a href="{{url_for('editc',cid=chapter.id)}}" class="btn btn-outline-info btn-block mt-1">EDIT</a>
+                    <a href="{{url_for('chpdel',cid=chapter.id)}}" class="btn btn-outline-danger btn-block mt-1">DELETE</a>
+                {%endif%}
+            </div>
         {%endfor%}
     </div>
     {%if current_user.email=='admin'%}

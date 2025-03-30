@@ -28,18 +28,18 @@ class registerForm(FlaskForm):
 
 class createSubForm(FlaskForm):
     def validate_subname(self,subject_to_check):
-        name=models.Subject.query.filter_by(name=subject_to_check.data).first()
-        if name:
-            raise ValidationError('Subject already exists. Please create a new one.')
+        existing_subject = models.Subject.query.filter_by(name=subject_to_check.data).first()
+        if existing_subject and existing_subject.id != self.subject_id:
+            raise ValidationError('Subject already exists. Please choose a different one.')
     subname=StringField(label='Subject Name:', validators=[Length(min=2, max=16), DataRequired()])
     subdesc=TextAreaField(label='Description:', validators=[Length(min=2, max=500), DataRequired()])
     submit=SubmitField(label='Submit')
 
 class createChpForm(FlaskForm):
     def validate_chpname(self,chp_to_check):
-        name=models.Chapter.query.filter_by(name=chp_to_check.data).first()
-        if name:
-            raise ValidationError('Email already exists. Please choose a different one.')
+        existing_chapter = models.Chapter.query.filter_by(name=chp_to_check.data).first()
+        if existing_chapter and existing_chapter.id != self.chapter_id:
+            raise ValidationError('Chapter already exists. Please choose a different one.')
     chpname=StringField(label='Chapter Name:', validators=[Length(min=2, max=16), DataRequired()])
     chpdesc=TextAreaField(label='Description:', validators=[Length(min=2, max=500), DataRequired()])
     submit=SubmitField(label='Submit')
@@ -57,10 +57,6 @@ class createQuizForm(FlaskForm):
     submit = SubmitField(label='Submit')
 
 class createQuesForm(FlaskForm):
-    def validate_question_statement(self,question_to_check):
-        name=models.Questions.query.filter_by(question_statement=question_to_check.data).first()
-        if name:
-            raise ValidationError('Question already exists. Please create a new one.')
     question_statement=StringField(label='Question:', validators=[Length(min=2, max=500), DataRequired()])
     correct_option=RadioField('Correct Option', choices=[(1, 'Option 1'), (2, 'Option 2'), (3, 'Option 3'), (4, 'Option 4')], validators=[DataRequired()])
     option1=StringField(label='Option 1:', validators=[Length(min=2, max=10), DataRequired()])
